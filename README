@@ -1,5 +1,5 @@
 Compares the two selected colors by their luminosity. The program is looped so you can select and compare a lot of colors
 
 * Needs `gpick` to be installed (which is a color picking utility for Linux) and available in the `PATH` environment variable (to be invokable through `subprocess.run`)
-* Run `comparator.py`
+* Run `comparator.py` (`python3 comparator.py`)
 * To exit, exit from `gpick` when it appears (by default it's done with the "Escape" key)
