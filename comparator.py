@@ -29,7 +29,7 @@ try:
             old_luminosity = prompt_for_luminosity("1. Old")
             new_luminosity = prompt_for_luminosity("2. New")
             print(f"3. old - new = {old_luminosity - new_luminosity}")
-    else if mode == "only_new":
+    elif mode == "only_new":
         old_luminosity = prompt_for_luminosity("1. Old")
         while True:
             new_luminosity = prompt_for_luminosity("2. New")
