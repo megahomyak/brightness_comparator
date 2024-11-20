@@ -1,43 +1,24 @@
-# Code partially taken from https://github.com/shreydan/global-color-picker/blob/main/picker.py
+import subprocess
+import re
 
-import pynput
-from PIL import Image, ImageGrab
-import tkinter
-import threading
+def execute(command_parts):
+    return subprocess.run(command_parts, capture_output=True).stdout.decode()
 
-old_luminosity = None
-root = tkinter.Tk()
-root.overrideredirect(True)  # Remove window decorations
-root.attributes('-alpha', 0.0)  # Make the window invisible
-root.attributes('-topmost', 1)  # Keep it on top
-threading.Thread(target=root.mainloop).start()
+class Exit(Exception):
+    pass
 
-
-def get_luminosity(x,y):
-    bbox = (x,y,x+1,y+1)
-    im = ImageGrab.grab(bbox=bbox)
-    rgbim = im.convert('RGB')
-    r,g,b = rgbim.getpixel((0,0))
+def prompt_for_luminosity():
+    match = re.match(r"#(..)(..)(..)", execute(["gpick", "-s", "-o"]))
+    if match is None:
+        raise Exit()
+    r, g, b = map(lambda n: int(n, 16), match.groups())
     luminosity = 0.299*r + 0.587*g + 0.114*b
     return luminosity
 
-def on_click(x, y, button, is_pressed):
-    global old_luminosity
-    root.geometry(f"1x1+{x}+{y}")
-    print(x, y)
-    if is_pressed:
-        luminosity = get_luminosity(x, y)
-        if old_luminosity is None:
-            luminosity = old_luminosity
-        else:
-            print(f"old - new = {old_luminosity - luminosity}")
-            old_luminosity = None
-
-def on_press(key):
-    if key == pynput.keyboard.Key.esc:
-        return False
-
-with \
-    pynput.mouse.Listener(on_click=on_click) as mouse_listener, \
-    pynput.keyboard.Listener(on_press=on_press) as keyboard_listener:
-    keyboard_listener.join()
+try:
+    while True:
+        old_luminosity = prompt_for_luminosity()
+        new_luminosity = prompt_for_luminosity()
+        print(f"old - new = {old_luminosity - new_luminosity}")
+except Exit:
+    pass
